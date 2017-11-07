@@ -33,7 +33,10 @@ CREATE TABLE IF NOT EXISTS `advisor` (
   UNIQUE INDEX `LastName_UNIQUE` (`LastName` ASC))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
-
+insert into mctc_it.advisor 
+(FirstName,LastName) values 
+('Rosa','Shannon'), 
+('Margot','Howard');
 
 -- -----------------------------------------------------
 -- Table `department`
@@ -46,8 +49,12 @@ CREATE TABLE IF NOT EXISTS `department` (
   PRIMARY KEY (`iddepartment`, `name`),
   UNIQUE INDEX `iddepartment_UNIQUE` (`iddepartment` ASC),
   UNIQUE INDEX `name_UNIQUE` (`name` ASC))
+  
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
+insert into mctc_it.department (name) values
+('ITEC'),
+('ENGL');
 
 
 -- -----------------------------------------------------
@@ -70,7 +77,15 @@ CREATE TABLE IF NOT EXISTS `faculty` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
-
+insert into mctc_it.faculty 
+(FirstName,LastName, DepartmentId) values 
+('First1','Faculty',1),
+('First2','Faculty',1),
+('First3','Faculty',1),
+('First4','Faculty',1),
+('First5','Faculty',2),
+('First6','Faculty',2),
+('First7','Faculty',2);
 
 -- -----------------------------------------------------
 -- Table `courses`
@@ -85,19 +100,26 @@ CREATE TABLE IF NOT EXISTS `courses` (
   `maxStudents` INT(11) NULL DEFAULT NULL,
   `faculty_idFaculty` INT(11) NOT NULL,
   `faculty_DepartmentId` INT(11) NOT NULL,
+  `sessionDays` VARCHAR(45) NOT NULL,
+  `startTime` VARCHAR(45) NOT NULL,
+  `endTime` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`idcourses`),
-  UNIQUE INDEX `idcourses_UNIQUE` (`idcourses` ASC),
-  INDEX `fk_courses_faculty1_idx` (`faculty_idFaculty` ASC, `faculty_DepartmentId` ASC)
- # CONSTRAINT `fk_courses_faculty1`
- #   FOREIGN KEY (`faculty_idFaculty` , `faculty_DepartmentId`)
- #   REFERENCES `faculty` (`idFaculty` , `DepartmentId`)
- #   ON DELETE NO ACTION
- #   ON UPDATE NO ACTION
- )
+  CONSTRAINT `fk_courses_faculty`
+    FOREIGN KEY (`faculty_idFaculty`)
+    REFERENCES `mctc_it`.`faculty` (`idFaculty`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
  
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
-
+INSERT INTO `mctc_it`.`courses` 
+(`code`, `section`, `name`, `maxStudents`, `faculty_idFaculty`, 
+`faculty_DepartmentId`, `sessionDays`,`startTime`,`endTime`) 
+VALUES 
+(0001, 01, 'Course1', 25, 1, 1,'T,Th','1:00','2:00'),
+(1351, 01, 'Course2', 25, 2, 1,'W','2:00','3:00'),
+(1981, 01, 'Course3', 25, 3, 2,'F','3:00','4:00'),
+(0112, 01, 'Fibonacci',13,1,1,'Sa','4:00','5:00');
 
 -- -----------------------------------------------------
 -- Table `major`
@@ -111,7 +133,11 @@ CREATE TABLE IF NOT EXISTS `major` (
   UNIQUE INDEX `idmajor_UNIQUE` (`idmajor` ASC))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
-
+insert into mctc_it.major 
+(name) values 
+('Software Development'),
+('Web Development'),
+('Computer and Network Support');
 
 -- -----------------------------------------------------
 -- Table `students`
@@ -140,7 +166,15 @@ CREATE TABLE IF NOT EXISTS `students` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
-
+insert into mctc_it.students 
+(FirstName,LastName,`major_idmajor`, `advisor_idadvisor`) values 
+('First1','Student',1,1),
+('First2','Student',1,1),
+('First3','Student',1,2),
+('First4','Student',1,2),
+('First5','Student',2,1),
+('First6','Student',2,2),
+('First7','Student',2,1);
 
 -- -----------------------------------------------------
 -- Table `transcript`
@@ -148,11 +182,9 @@ DEFAULT CHARACTER SET = utf8;
 DROP TABLE IF EXISTS `transcript` ;
 
 CREATE TABLE IF NOT EXISTS `transcript` (
-  `StudentId` INT(11) NOT NULL,
   `Grade` VARCHAR(45) NULL DEFAULT NULL,
   `students_idStudents` INT(11) NOT NULL,
   `courses_idcourses` INT(10) UNSIGNED ZEROFILL NOT NULL,
-  PRIMARY KEY (`StudentId`),
   INDEX `fk_transcript_students1_idx` (`students_idStudents` ASC),
   INDEX `fk_transcript_courses1_idx` (`courses_idcourses` ASC),
   CONSTRAINT `fk_transcript_students1`
@@ -167,6 +199,17 @@ CREATE TABLE IF NOT EXISTS `transcript` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
+
+INSERT INTO `mctc_it`.`transcript`
+(`Grade`,
+`students_idStudents`,
+`courses_idcourses`)
+VALUES
+('A',
+1,
+1);
+
+
 
 
 -- -----------------------------------------------------
@@ -191,7 +234,18 @@ CREATE TABLE IF NOT EXISTS `courses_has_students` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
-
+INSERT INTO `mctc_it`.`courses_has_students`
+(`courses_idcourses`,
+`students_idStudents`)
+VALUES
+(1,1),
+(1,2),
+(1,3),
+(2,1),
+(2,2),
+(3,3),
+(3,1),
+(1,4);
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
